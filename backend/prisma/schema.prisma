@@ -1,0 +1,815 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model AccountantProfile {
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @unique(map: "AccountantProfile_userId_key")
+  phone                 String?
+  gender                String?
+  dateOfBirth           DateTime?
+  address               String?   @db.Text
+  avatar                String?
+  nationalId            String?
+  issueDate             DateTime?
+  issuePlace            String?
+  hometown              String?
+  maritalStatus         String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  notes                 String?   @db.Text
+  specialization        String?
+  degree                String?
+  educationLevel        String?
+  graduatedSchool       String?
+  graduationYear        Int?
+  certificateNumber     String?
+  certificateIssueDate  DateTime?
+  certificateExpiryDate DateTime?
+  yearsOfExperience     Int?
+  professionalSkills    Json?
+  softwareSkills        Json?
+  languages             Json?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "AccountantProfile_userId_fkey")
+
+  @@map("accountantprofile")
+}
+
+model AdminProfile {
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @unique(map: "AdminProfile_userId_key")
+  phone                 String?
+  gender                String?
+  dateOfBirth           DateTime?
+  address               String?   @db.Text
+  avatar                String?
+  nationalId            String?
+  issueDate             DateTime?
+  issuePlace            String?
+  hometown              String?
+  maritalStatus         String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  notes                 String?   @db.Text
+  specialization        String?
+  degree                String?
+  educationLevel        String?
+  graduatedSchool       String?
+  graduationYear        Int?
+  certificateNumber     String?
+  certificateIssueDate  DateTime?
+  certificateExpiryDate DateTime?
+  yearsOfExperience     Int?
+  professionalSkills    Json?
+  systemPermissions     Json?
+  languages             Json?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  branch                String?
+  contractFiles         Json?
+  contractNumber        String?
+  department            String?
+  employmentStatus      String?
+  endDate               DateTime?
+  identityFiles         Json?
+  position              String?
+  profileDocuments      Json?
+  qualificationFiles    Json?
+  startDate             DateTime?
+  workType              String?
+  workingNote           String?   @db.Text
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "AdminProfile_userId_fkey")
+
+  @@map("adminprofile")
+}
+
+model Appointment {
+  id                               Int       @id @default(autoincrement())
+  code                             String    @unique(map: "Appointment_code_key")
+  patientName                      String
+  patientPhone                     String
+  patientDob                       DateTime?
+  patientGender                    String?
+  note                             String?   @db.LongText
+  cancelReason                     String?   @db.LongText
+  doctorId                         Int?
+  serviceId                        Int?
+  patientId                        Int?
+  appointmentDate                  DateTime
+  status                           String    @default("PENDING")
+  createdBy                        Int?
+  createdAt                        DateTime  @default(now())
+  updatedAt                        DateTime  @updatedAt
+  creator                          User?     @relation("appointment_createdByTouser", fields: [createdBy], references: [id], map: "Appointment_createdBy_fkey")
+  doctor                           User?     @relation("appointment_doctorIdTouser", fields: [doctorId], references: [id], map: "Appointment_doctorId_fkey")
+  service                          Service?  @relation(fields: [serviceId], references: [id], map: "Appointment_serviceId_fkey")
+  patient                          Patient?  @relation(fields: [patientId], references: [id], map: "Appointment_patientId_fkey")
+  reception                        Reception?
+
+  @@index([appointmentDate], map: "Appointment_appointmentDate_idx")
+  @@index([createdBy],       map: "Appointment_createdBy_fkey")
+  @@index([doctorId],        map: "Appointment_doctorId_fkey")
+  @@index([patientPhone],    map: "Appointment_patientPhone_idx")
+  @@index([serviceId],       map: "Appointment_serviceId_fkey")
+  @@index([patientId],       map: "Appointment_patientId_fkey")
+  @@index([status],          map: "Appointment_status_idx")
+  @@map("appointment")
+}
+
+model DoctorProfile {
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @unique(map: "DoctorProfile_userId_key")
+  phone                 String?
+  gender                String?
+  dateOfBirth           DateTime?
+  address               String?   @db.Text
+  avatar                String?
+  nationalId            String?
+  issueDate             DateTime?
+  issuePlace            String?
+  hometown              String?
+  maritalStatus         String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  notes                 String?   @db.Text
+  specialization        String?
+  degree                String?
+  educationLevel        String?
+  graduatedSchool       String?
+  graduationYear        Int?
+  licenseNumber         String?   @unique(map: "DoctorProfile_licenseNumber_key")
+  licenseIssueDate      DateTime?
+  licenseExpiryDate     DateTime?
+  yearsOfExperience     Int?
+  professionalSkills    Json?
+  servicesCanPerform    Json?
+  languages             Json?
+  employmentStatus      String?
+  position              String?
+  workType              String?
+  startDate             DateTime?
+  endDate               DateTime?
+  contractNumber        String?
+  scheduleType          String?
+  workingDays           Json?
+  shiftStart            String?
+  shiftEnd              String?
+  maxAppointmentsPerDay Int?
+  appointmentDuration   Int?
+  isAvailableOnline     Boolean   @default(false)
+  baseSalary            Decimal?  @db.Decimal(12, 2)
+  salaryType            String?
+  commissionRate        Decimal?  @db.Decimal(5, 2)
+  bankAccountName       String?
+  bankName              String?
+  bankAccountNumber     String?
+  taxCode               String?
+  insuranceNumber       String?
+  qualificationFiles    Json?
+  licenseFiles          Json?
+  identityFiles         Json?
+  contractFiles         Json?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "DoctorProfile_userId_fkey")
+
+  @@map("doctorprofile")
+}
+
+model DoctorSchedule {
+  id             Int           @id @default(autoincrement())
+  doctorId       Int
+  shiftId        Int
+  workDate       DateTime
+  serviceGroupId Int?
+  note           String?       @db.Text
+  isOverride     Boolean       @default(false)
+  createdBy      Int?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime  @updatedAt
+  createdByUser  User?         @relation("doctorschedule_createdByTouser", fields: [createdBy], references: [id], map: "DoctorSchedule_createdBy_fkey")
+  doctor         User          @relation("doctorschedule_doctorIdTouser", fields: [doctorId], references: [id], map: "DoctorSchedule_doctorId_fkey")
+  serviceGroup   ServiceGroup? @relation(fields: [serviceGroupId], references: [id], map: "DoctorSchedule_serviceGroupId_fkey")
+  shift          WorkShift     @relation(fields: [shiftId], references: [id], map: "DoctorSchedule_shiftId_fkey")
+  receptions     Reception[]
+
+  @@unique([doctorId, shiftId, workDate], map: "DoctorSchedule_doctorId_shiftId_workDate_key")
+  @@index([createdBy], map: "DoctorSchedule_createdBy_fkey")
+  @@index([serviceGroupId], map: "DoctorSchedule_serviceGroupId_fkey")
+  @@index([shiftId], map: "DoctorSchedule_shiftId_fkey")
+  @@map("doctorschedule")
+}
+
+model DentalChair {
+  id         Int         @id @default(autoincrement())
+  name       String
+  number     Int         @unique
+  isActive   Boolean     @default(true)
+  receptions Reception[]
+
+  @@map("dental_chair")
+}
+
+model Reception {
+  id             Int          @id @default(autoincrement())
+  code           String       @unique
+  patientId      Int
+  appointmentId  Int?         @unique
+  receptionistId Int
+  doctorId       Int?
+  scheduleId     Int?
+  chairId        Int?
+
+  arrivedAt      DateTime     @default(now())
+  seatStartAt    DateTime?
+  endAt          DateTime?
+
+  visitReason    String       @default("NEW_EXAM")
+  queuePriority  Int          @default(5)
+  queuePosition  Int?
+  status         String       @default("WAITING")
+  cancelReason   String?
+  adminNote      String?      @db.Text
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  patient        Patient       @relation(fields: [patientId],      references: [id], map: "Reception_patientId_fkey")
+  appointment    Appointment?  @relation(fields: [appointmentId],  references: [id], map: "Reception_appointmentId_fkey")
+  receptionist   User          @relation("Reception_receptionist", fields: [receptionistId], references: [id], map: "Reception_receptionistId_fkey")
+  doctor         User?         @relation("Reception_doctor",       fields: [doctorId],       references: [id], map: "Reception_doctorId_fkey")
+  schedule       DoctorSchedule? @relation(fields: [scheduleId],  references: [id], map: "Reception_scheduleId_fkey")
+  chair          DentalChair?  @relation(fields: [chairId],        references: [id], map: "Reception_chairId_fkey")
+  dentalRecord   DentalRecord?
+  invoice        Invoice?
+
+  @@index([patientId],      map: "Reception_patientId_idx")
+  @@index([receptionistId], map: "Reception_receptionistId_idx")
+  @@index([doctorId],       map: "Reception_doctorId_idx")
+  @@index([scheduleId],     map: "Reception_scheduleId_idx")
+  @@index([chairId],        map: "Reception_chairId_idx")
+  @@index([status],         map: "Reception_status_idx")
+  @@index([arrivedAt],      map: "Reception_arrivedAt_idx")
+  @@map("reception")
+}
+
+model Patient {
+  id                    Int         @id @default(autoincrement())
+  code                  String      @unique
+  fullName              String
+  dateOfBirth           DateTime
+  gender                String
+  phone                 String
+  nationalId            String?
+  bhytCode              String?
+  address               String?     @db.Text
+  occupation            String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  adminNote             String?     @db.Text
+  classification        String      @default("NEW")
+  isComplete            Boolean     @default(true)
+  isActive              Boolean     @default(true)
+  allergies             String?     @db.Text
+  systemicDiseases      String?     @db.Text
+  dentalAnxietyLevel    String?
+  internalNote          String?     @db.Text
+  toothChart            Json?
+  createdBy             Int?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  createdByUser         User?          @relation(fields: [createdBy], references: [id], map: "Patient_createdBy_fkey")
+  appointments          Appointment[]
+  receptions            Reception[]
+  dentalRecords         DentalRecord[]
+  invoices              Invoice[]
+
+  @@index([phone],      map: "Patient_phone_idx")
+  @@index([nationalId], map: "Patient_nationalId_idx")
+  @@index([createdBy],  map: "Patient_createdBy_fkey")
+  @@map("patient")
+}
+
+model Holiday {
+  id         Int      @id @default(autoincrement())
+  name       String
+  startDate  DateTime
+  endDate    DateTime
+  type       String   @default("NATIONAL")
+  sendSms    Boolean  @default(false)
+  autoCancel Boolean  @default(false)
+  /// Giá» báº¯t Ä‘áº§u nghá»‰ "HH:MM" â€” chá»‰ dÃ¹ng cho PRIVATE / RECURRING; null = cáº£ ngÃ y
+  startTime  String?  @db.VarChar(5)
+  /// Giá» káº¿t thÃºc nghá»‰ "HH:MM" â€” chá»‰ dÃ¹ng cho PRIVATE / RECURRING; null = cáº£ ngÃ y
+  endTime    String?  @db.VarChar(5)
+  createdBy  Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime  @updatedAt
+  user       User?    @relation(fields: [createdBy], references: [id], map: "Holiday_createdBy_fkey")
+
+  @@index([createdBy], map: "Holiday_createdBy_fkey")
+  @@index([startDate], map: "Holiday_startDate_idx")
+  @@map("holiday")
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique(map: "PasswordResetToken_token_key")
+  userId    Int
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "PasswordResetToken_userId_fkey")
+
+  @@index([userId], map: "PasswordResetToken_userId_fkey")
+  @@map("passwordresettoken")
+}
+
+model ReceptionistProfile {
+  id                    Int       @id @default(autoincrement())
+  userId                Int       @unique(map: "ReceptionistProfile_userId_key")
+  phone                 String?
+  gender                String?
+  dateOfBirth           DateTime?
+  address               String?   @db.Text
+  avatar                String?
+  nationalId            String?
+  issueDate             DateTime?
+  issuePlace            String?
+  hometown              String?
+  maritalStatus         String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  notes                 String?   @db.Text
+  educationLevel        String?
+  graduatedSchool       String?
+  graduationYear        Int?
+  yearsOfExperience     Int?
+  professionalSkills    Json?
+  languages             Json?
+  computerSkills        Json?
+  customerServiceLevel  String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "ReceptionistProfile_userId_fkey")
+
+  @@map("receptionistprofile")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique(map: "RefreshToken_token_key") @db.VarChar(500)
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "RefreshToken_userId_fkey")
+
+  @@index([userId], map: "RefreshToken_userId_fkey")
+  @@map("refreshtoken")
+}
+
+model Role {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique(map: "Role_name_key")
+  userRoles UserRole[]
+
+  @@map("role")
+}
+
+model Service {
+  id             Int            @id @default(autoincrement())
+  code           String         @unique(map: "Service_code_key")
+  name           String
+  description    String?        @db.Text
+  duration       Int            @default(0)
+  serviceGroupId Int
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime  @updatedAt
+  activatedAt    DateTime?
+  status         String         @default("INACTIVE")
+  usageCount     Int            @default(0)
+  appointments         Appointment[]
+  serviceGroup         ServiceGroup         @relation(fields: [serviceGroupId], references: [id], map: "Service_serviceGroupId_fkey")
+  servicePrices        ServicePrice[]
+  dentalRecordServices DentalRecordService[]
+  invoiceItems         InvoiceItem[]
+
+  @@index([serviceGroupId], map: "Service_serviceGroupId_fkey")
+  @@map("service")
+}
+
+model ServiceGroup {
+  id                  Int                  @id @default(autoincrement())
+  name                String               @unique(map: "ServiceGroup_name_key")
+  description         String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime  @updatedAt
+  doctorSchedules     DoctorSchedule[]
+  services            Service[]
+  doctors             ServiceGroupDoctor[]
+
+  @@map("servicegroup")
+}
+
+model ServiceGroupDoctor {
+  id             Int          @id @default(autoincrement())
+  serviceGroupId Int
+  doctorId       Int
+  doctor         User         @relation(fields: [doctorId], references: [id], map: "ServiceGroupDoctor_doctorId_fkey")
+  serviceGroup   ServiceGroup @relation(fields: [serviceGroupId], references: [id], onDelete: Cascade, map: "ServiceGroupDoctor_serviceGroupId_fkey")
+
+  @@unique([serviceGroupId, doctorId], map: "ServiceGroupDoctor_serviceGroupId_doctorId_key")
+  @@index([doctorId], map: "ServiceGroupDoctor_doctorId_fkey")
+  @@map("servicegroupdoctor")
+}
+
+model ServicePrice {
+  id          Int       @id @default(autoincrement())
+  serviceId   Int
+  basePrice   Int
+  discountPct Float     @default(0)
+  startDate   DateTime
+  endDate     DateTime?
+  createdBy   Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdByUser User?   @relation(fields: [createdBy], references: [id], map: "ServicePrice_createdBy_fkey")
+  service     Service   @relation(fields: [serviceId], references: [id], map: "ServicePrice_serviceId_fkey")
+
+  @@index([createdBy], map: "ServicePrice_createdBy_fkey")
+  @@index([serviceId], map: "ServicePrice_serviceId_fkey")
+  @@map("serviceprice")
+}
+
+model SmsConfig {
+  id         Int      @id
+  isEnabled  Boolean  @default(true)
+  provider   String   @default("VIETTEL")
+  apiKey     String?  @db.Text
+  brandname  String   @default("DentCare")
+  dailyLimit Int      @default(500)
+  quietStart String   @default("21:00") @db.VarChar(10)
+  quietEnd   String   @default("07:00") @db.VarChar(10)
+  updatedAt  DateTime  @updatedAt
+  secretKey  String?  @db.LongText
+
+  @@map("smsconfig")
+}
+
+model SmsLog {
+  id            Int       @id @default(autoincrement())
+  recipientName String?
+  phone         String
+  type          String
+  status        String    @default("PENDING")
+  content       String    @db.Text
+  retryCount    Int       @default(0)
+  errorMsg      String?
+  sentAt        DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([createdAt], map: "SmsLog_createdAt_idx")
+  @@index([status], map: "SmsLog_status_idx")
+  @@map("smslog")
+}
+
+model SmsTemplate {
+  id        Int      @id @default(autoincrement())
+  type      String   @unique(map: "SmsTemplate_type_key")
+  name      String
+  content   String   @db.Text
+  isEnabled Boolean  @default(true)
+  sortOrder Int      @default(0)
+  updatedAt DateTime  @updatedAt
+
+  @@map("smstemplate")
+}
+
+model SystemLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String
+  detail    String?  @db.Text
+  ip        String?
+  createdAt DateTime @default(now())
+  module    String?
+  status    String   @default("SUCCESS")
+  user      User?    @relation(fields: [userId], references: [id], map: "SystemLog_userId_fkey")
+
+  @@index([userId], map: "SystemLog_userId_fkey")
+  @@map("systemlog")
+}
+
+model User {
+  id                         Int                  @id @default(autoincrement())
+  fullName                   String
+  username                   String               @unique(map: "User_username_key")
+  email                      String               @unique(map: "User_email_key")
+  password                   String
+  isActive                   Boolean              @default(true)
+  loginAttempts              Int                  @default(0)
+  lockedUntil                DateTime?
+  createdAt                  DateTime             @default(now())
+  updatedAt                  DateTime  @updatedAt
+  lockReason                 String?
+  accountantProfile          AccountantProfile?
+  adminProfile               AdminProfile?
+  appointmentsCreated        Appointment[]        @relation("appointment_createdByTouser")
+  appointmentsAsDoctor       Appointment[]        @relation("appointment_doctorIdTouser")
+  doctorProfile              DoctorProfile?
+  doctorSchedulesCreated     DoctorSchedule[]     @relation("doctorschedule_createdByTouser")
+  doctorSchedules            DoctorSchedule[]     @relation("doctorschedule_doctorIdTouser")
+  holidays                   Holiday[]
+  passwordResetTokens        PasswordResetToken[]
+  receptionistProfile        ReceptionistProfile?
+  refreshTokens              RefreshToken[]
+  serviceGroups              ServiceGroupDoctor[]
+  servicePrices              ServicePrice[]
+  logs                       SystemLog[]
+  userCertificates           UserCertificate[]
+  roles                      UserRole[]
+  patientsCreated            Patient[]
+  receptionsHandled          Reception[]    @relation("Reception_receptionist")
+  receptionsAsDoctor         Reception[]    @relation("Reception_doctor")
+  dentalRecords              DentalRecord[] @relation("DentalRecord_doctor")
+  invoicesAsDoctor           Invoice[]      @relation("Invoice_doctor")
+  invoicesConfirmed          Invoice[]      @relation("Invoice_confirmer")
+  hourlyRates                HourlyRate[]
+  fixedSalariesAsUser        FixedSalary[]  @relation("FixedSalaryUser")
+  fixedSalariesCreated       FixedSalary[]  @relation("FixedSalaryCreator")
+  allowancesCreated          Allowance[]    @relation("AllowanceCreator")
+  shiftCoefficientsUpdated   ShiftCoefficient[] @relation("ShiftCoefficientUpdater")
+  payslips                   Payslip[]          @relation("PayslipUser")
+  payslipsCreated            Payslip[]          @relation("PayslipCreator")
+
+  @@map("user")
+}
+
+model UserCertificate {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  filename     String
+  originalName String
+  mimetype     String
+  size         Int
+  uploadedAt   DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "UserCertificate_userId_fkey")
+
+  @@index([userId], map: "UserCertificate_userId_fkey")
+  @@map("usercertificate")
+}
+
+model UserRole {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id], map: "UserRole_roleId_fkey")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, map: "UserRole_userId_fkey")
+
+  @@unique([userId, roleId], map: "UserRole_userId_roleId_key")
+  @@index([roleId], map: "UserRole_roleId_fkey")
+  @@map("userrole")
+}
+
+model WorkShift {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique(map: "WorkShift_name_key")
+  startTime        String
+  endTime          String
+  slotDuration     Int
+  bufferTime       Int                @default(0)
+  maxPatients      Int
+  reserveSlots     Int                @default(1)
+  applyDays        Json
+  isActive         Boolean            @default(true)
+  colorCode        String             @default("blue")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  doctorSchedules  DoctorSchedule[]
+  shiftCoefficients ShiftCoefficient[]
+
+  @@map("workshift")
+}
+
+/// UC4.2 – Hệ số ca làm việc × ngày trong tuần
+model ShiftCoefficient {
+  id          Int       @id @default(autoincrement())
+  shiftId     Int
+  dayOfWeek   Int                          // 1=Thứ Hai … 7=Chủ nhật
+  coefficient Decimal   @db.Decimal(4, 2) @default(1.00)
+  updatedBy   Int?
+  updatedAt   DateTime  @updatedAt
+  shift       WorkShift @relation(fields: [shiftId],   references: [id], map: "ShiftCoefficient_shiftId_fkey")
+  updater     User?     @relation("ShiftCoefficientUpdater", fields: [updatedBy], references: [id], map: "ShiftCoefficient_updatedBy_fkey")
+
+  @@unique([shiftId, dayOfWeek], map: "ShiftCoefficient_shiftId_dayOfWeek_key")
+  @@index([updatedBy], map: "ShiftCoefficient_updatedBy_fkey")
+  @@map("shiftcoefficient")
+}
+
+// ─── CN3.7: Bệnh án & Điều trị ──────────────────────────────
+
+model DentalRecord {
+  id               Int      @id @default(autoincrement())
+  code             String   @unique              // HR-YYYYMMDD-XXXX
+  receptionId      Int      @unique
+  patientId        Int
+  doctorId         Int
+
+  // Bước 3: Lý do & triệu chứng
+  visitReason      String?  @db.Text
+  symptoms         String?  @db.Text
+
+  // Bước 6: Chẩn đoán ICD-10
+  icd10Code        String?
+  icd10Description String?
+
+  // Bước 10: Ghi chú & hướng dẫn
+  clinicalNotes    String?  @db.Text
+  aftercareNotes   String?  @db.Text
+  followUpDate     DateTime?
+
+  // Trạng thái
+  status           String   @default("DRAFT")   // DRAFT | SIGNED
+  signedAt         DateTime?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  reception        Reception             @relation(fields: [receptionId], references: [id])
+  patient          Patient               @relation(fields: [patientId],   references: [id])
+  doctor           User                  @relation("DentalRecord_doctor", fields: [doctorId], references: [id])
+  services         DentalRecordService[]
+  invoice          Invoice?
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([status])
+  @@map("dental_record")
+}
+
+model DentalRecordService {
+  id          Int     @id @default(autoincrement())
+  recordId    Int
+  serviceId   Int
+  toothNumber String?   // "46", "hàm trên", v.v.
+  unitPrice   Int     @default(0)
+  quantity    Int     @default(1)
+  note        String?
+
+  record      DentalRecord @relation(fields: [recordId],  references: [id], onDelete: Cascade)
+  service     Service      @relation(fields: [serviceId], references: [id])
+
+  @@index([recordId])
+  @@index([serviceId])
+  @@map("dental_record_service")
+}
+
+// ─── CN3.8: Hóa đơn & Thanh toán ────────────────────────────
+
+model Invoice {
+  id             Int      @id @default(autoincrement())
+  code           String   @unique                      // HĐ-YYYYMMDD-XXXX
+  receptionId    Int      @unique
+  dentalRecordId Int      @unique
+  patientId      Int
+  doctorId       Int
+
+  subtotal       Int      @default(0)                  // Tổng trước giảm
+  discountAmount Int      @default(0)                  // Số tiền giảm tuyệt đối
+  discountPct    Float    @default(0)                  // % giảm giá
+  voucherCode    String?
+  totalAmount    Int      @default(0)                  // Khách phải trả
+  bhytAmount     Int      @default(0)                  // BHYT chi trả
+
+  paymentMethod  String?                               // CASH | CARD | MOMO | ZALOPAY | VNPAY
+  paymentNote    String?
+  paidAt         DateTime?
+  notes          String?  @db.Text
+
+  status         String   @default("WAITING_PAYMENT")  // WAITING_PAYMENT | PAID | CANCELLED | REFUNDED
+  confirmedBy    Int?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  reception    Reception    @relation(fields: [receptionId],    references: [id])
+  dentalRecord DentalRecord @relation(fields: [dentalRecordId], references: [id])
+  patient      Patient      @relation(fields: [patientId],      references: [id])
+  doctor       User         @relation("Invoice_doctor",    fields: [doctorId],    references: [id])
+  confirmer    User?        @relation("Invoice_confirmer", fields: [confirmedBy], references: [id])
+  items        InvoiceItem[]
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([paidAt])
+  @@map("invoice")
+}
+
+model InvoiceItem {
+  id          Int     @id @default(autoincrement())
+  invoiceId   Int
+  serviceId   Int
+  serviceName String                                   // snapshot
+  toothNumber String?
+  unitPrice   Int     @default(0)
+  quantity    Int     @default(1)
+  bhytCovered Boolean @default(false)
+  amount      Int     @default(0)                      // unitPrice × quantity
+  note        String?
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@index([invoiceId])
+  @@index([serviceId])
+  @@map("invoice_item")
+}
+
+// ─── CN4: Quản lý lương ──────────────────────────────────────
+
+/// UC4.4/4.5 – Phiếu lương tháng
+model Payslip {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  month        String                        // 'YYYY-MM'
+  role         String                        // 'DOCTOR' | 'RECEPTIONIST' | 'ACCOUNTANT'
+  sessionCount Int?                          // Bác sĩ: số ca trực
+  hoursWorked  Decimal?  @db.Decimal(6, 2)  // Bác sĩ: giờ quy đổi
+  salaryAmount Int       @default(0)
+  allowance    Int       @default(0)
+  deduction    Int       @default(0)
+  netSalary    Int       @default(0)
+  status       String    @default("DRAFT")  // DRAFT | APPROVED | FINALIZED
+  note         String?
+  createdBy    Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation("PayslipUser",    fields: [userId],    references: [id], map: "Payslip_userId_fkey")
+  creator      User?     @relation("PayslipCreator", fields: [createdBy], references: [id], map: "Payslip_createdBy_fkey")
+
+  @@unique([userId, month], map: "Payslip_userId_month_key")
+  @@index([month],     map: "Payslip_month_idx")
+  @@index([createdBy], map: "Payslip_createdBy_fkey")
+  @@map("payslip")
+}
+
+
+/// UC4.1 – Đơn giá một giờ công (dùng tính lương bác sĩ)
+model HourlyRate {
+  id        Int       @id @default(autoincrement())
+  amount    Int                          // đồng/giờ
+  startDate DateTime
+  endDate   DateTime?
+  createdBy Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  creator   User?     @relation(fields: [createdBy], references: [id], map: "HourlyRate_createdBy_fkey")
+
+  @@index([createdBy], map: "HourlyRate_createdBy_fkey")
+  @@map("hourlyrate")
+}
+
+/// UC4.1 – Lương cố định tháng cho từng nhân viên Lễ tân / Kế toán
+model FixedSalary {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  amount    Int                          // đồng/tháng
+  startDate DateTime
+  endDate   DateTime?
+  createdBy Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation("FixedSalaryUser",    fields: [userId],    references: [id], map: "FixedSalary_userId_fkey")
+  creator   User?     @relation("FixedSalaryCreator", fields: [createdBy], references: [id], map: "FixedSalary_createdBy_fkey")
+
+  @@index([userId],    map: "FixedSalary_userId_fkey")
+  @@index([createdBy], map: "FixedSalary_createdBy_fkey")
+  @@map("fixedsalary")
+}
+
+/// UC4.1 – Phụ cấp chung cho Lễ tân & Kế toán
+model Allowance {
+  id        Int       @id @default(autoincrement())
+  name      String                       // Tên phụ cấp (VD: "Phụ cấp ăn trưa")
+  amount    Int                          // đồng/tháng
+  appliesTo String    @default("BOTH")  // 'RECEPTIONIST' | 'ACCOUNTANT' | 'BOTH'
+  startDate DateTime
+  endDate   DateTime?
+  createdBy Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  creator   User?     @relation("AllowanceCreator", fields: [createdBy], references: [id], map: "Allowance_createdBy_fkey")
+
+  @@index([createdBy], map: "Allowance_createdBy_fkey")
+  @@map("allowance")
+}

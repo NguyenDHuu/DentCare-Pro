@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sơ đồ lớp – DentCare Pro</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; }
+
+    header {
+      background: linear-gradient(135deg, #1e40af, #4338ca);
+      color: white; padding: 20px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 700; }
+    header p  { font-size: 0.82rem; opacity: .75; margin-top: 2px; }
+
+    .legend {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      padding: 12px 32px;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.78rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 12px; height: 12px; border-radius: 3px; }
+
+    .tabs {
+      display: flex; gap: 4px; padding: 12px 32px 0;
+      background: white; border-bottom: 2px solid #e2e8f0;
+    }
+    .tab {
+      padding: 7px 18px; border-radius: 8px 8px 0 0;
+      border: 1px solid transparent; border-bottom: none;
+      cursor: pointer; font-size: 0.82rem; font-weight: 600;
+      color: #64748b; transition: all .15s;
+    }
+    .tab:hover   { background: #f1f5f9; color: #1e40af; }
+    .tab.active  {
+      background: white; color: #1e40af;
+      border-color: #e2e8f0; border-bottom-color: white;
+      margin-bottom: -2px;
+    }
+
+    .panel { display: none; padding: 24px 32px; }
+    .panel.active { display: block; }
+
+    .diagram-wrap {
+      background: white; border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 20px; overflow: auto;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .mermaid { min-width: 900px; }
+
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px; margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white; border-radius: 10px;
+      border: 1px solid #e2e8f0; padding: 14px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+    .stat-card .num { font-size: 1.6rem; font-weight: 800; color: #1e40af; }
+    .stat-card .lbl { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🦷 DentCare Pro — Sơ đồ lớp hệ thống</h1>
+    <p>Class Diagram · Prisma Schema · 30 models · 7 nhóm nghiệp vụ</p>
+  </div>
+  <div style="font-size:.75rem;opacity:.7;text-align:right">
+    Backend: Node.js + Express + Prisma<br>
+    Database: MySQL · ORM: Prisma
+  </div>
+</header>
+
+<!-- Legend -->
+<div class="legend">
+  <strong style="color:#1e293b">Chú thích quan hệ:</strong>
+  <span class="legend-item"><span style="color:#2563eb;font-weight:700">──▷</span> Association (có)</span>
+  <span class="legend-item"><span style="color:#16a34a;font-weight:700">──◇</span> Aggregation (thuộc về)</span>
+  <span class="legend-item"><span style="color:#dc2626;font-weight:700">──◆</span> Composition (tạo nên)</span>
+  <span class="legend-item"><span style="color:#7c3aed;font-weight:700">·····▷</span> Dependency (phụ thuộc)</span>
+  <span class="legend-item"><span style="color:#0d9488;font-weight:700">──|▷</span> Inheritance (kế thừa)</span>
+  <span style="margin-left:auto;color:#64748b;font-size:.75rem">* = 0..1 &nbsp;|&nbsp; 1 = exactly 1 &nbsp;|&nbsp; N = many</span>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('full')">📊 Toàn bộ hệ thống</div>
+  <div class="tab" onclick="showTab('auth')">🔐 User &amp; Phân quyền</div>
+  <div class="tab" onclick="showTab('clinic')">🏥 Khám &amp; Điều trị</div>
+  <div class="tab" onclick="showTab('service')">💊 Dịch vụ &amp; Giá</div>
+  <div class="tab" onclick="showTab('schedule')">📅 Lịch làm việc</div>
+  <div class="tab" onclick="showTab('salary')">💰 Quản lý lương</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: FULL                                             -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="tab-full" class="panel active">
+  <div class="stats">
+    <div class="stat-card"><div class="num">30</div><div class="lbl">Models (bảng)</div></div>
+    <div class="stat-card"><div class="num">7</div><div class="lbl">Nhóm nghiệp vụ</div></div>
+    <div class="stat-card"><div class="num">5</div><div class="lbl">Vai trò người dùng</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="lbl">Luồng chính</div></div>
+    <div class="stat-card"><div class="num">54</div><div class="lbl">Phiếu lương (seed)</div></div>
+  </div>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+classDiagram
+  direction TB
+
+  %% ─── USER ───────────────────────────────────────────
+  class User {
+    +Int id PK
+    +String fullName
+    +String username UK
+    +String email UK
+    +String password
+    +Boolean isActive
+    +DateTime createdAt
+  }
+  class Role {
+    +Int id PK
+    +String name UK
+  }
+  class UserRole {
+    +Int id PK
+    +Int userId FK
+    +Int roleId FK
+  }
+  class DoctorProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String degree
+    +String specialization
+    +String licenseNumber
+    +DateTime startDate
+  }
+  class ReceptionistProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String phone
+    +String gender
+  }
+  class AccountantProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String phone
+    +String degree
+  }
+  class AdminProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String position
+    +String department
+  }
+
+  %% ─── PATIENT & APPOINTMENT ──────────────────────────
+  class Patient {
+    +Int id PK
+    +String code UK
+    +String fullName
+    +DateTime dateOfBirth
+    +String gender
+    +String phone
+    +String classification
+  }
+  class Appointment {
+    +Int id PK
+    +String code UK
+    +String patientName
+    +DateTime appointmentDate
+    +String status
+    +Int doctorId FK
+    +Int patientId FK
+    +Int serviceId FK
+  }
+
+  %% ─── RECEPTION ──────────────────────────────────────
+  class Reception {
+    +Int id PK
+    +String code UK
+    +Int patientId FK
+    +Int appointmentId UK,FK
+    +Int receptionistId FK
+    +Int doctorId FK
+    +Int chairId FK
+    +Int scheduleId FK
+    +String status
+    +DateTime arrivedAt
+  }
+  class DentalChair {
+    +Int id PK
+    +String name
+    +Int number UK
+    +Boolean isActive
+  }
+  class PatientComplexity {
+    +Int id PK
+    +Int receptionId FK
+    +Decimal proposedCoeff
+    +Decimal approvedCoeff
+    +String status
+    +Int approvedBy FK
+  }
+
+  %% ─── DENTAL RECORD ───────────────────────────────────
+  class DentalRecord {
+    +Int id PK
+    +String code UK
+    +Int receptionId UK,FK
+    +Int patientId FK
+    +Int doctorId FK
+    +String icd10Code
+    +String status
+    +DateTime signedAt
+  }
+  class DentalRecordService {
+    +Int id PK
+    +Int recordId FK
+    +Int serviceId FK
+    +String toothNumber
+    +Int unitPrice
+    +Int quantity
+  }
+
+  %% ─── SERVICE ─────────────────────────────────────────
+  class ServiceGroup {
+    +Int id PK
+    +String name UK
+    +String description
+  }
+  class Service {
+    +Int id PK
+    +String code UK
+    +String name
+    +String status
+    +Int serviceGroupId FK
+  }
+  class ServicePrice {
+    +Int id PK
+    +Int serviceId FK
+    +Int basePrice
+    +Float discountPct
+    +DateTime startDate
+    +DateTime endDate
+  }
+  class ServiceGroupDoctor {
+    +Int id PK
+    +Int serviceGroupId FK
+    +Int doctorId FK
+  }
+
+  %% ─── INVOICE ─────────────────────────────────────────
+  class Invoice {
+    +Int id PK
+    +String code UK
+    +Int receptionId UK,FK
+    +Int dentalRecordId UK,FK
+    +Int patientId FK
+    +Int totalAmount
+    +String paymentMethod
+    +String status
+  }
+  class InvoiceItem {
+    +Int id PK
+    +Int invoiceId FK
+    +Int serviceId FK
+    +String serviceName
+    +Int unitPrice
+    +Int quantity
+    +Int amount
+  }
+
+  %% ─── SCHEDULING ─────────────────────────────────────
+  class WorkShift {
+    +Int id PK
+    +String name UK
+    +String startTime
+    +String endTime
+    +Int maxPatients
+    +Json applyDays
+    +Boolean isActive
+  }
+  class DoctorSchedule {
+    +Int id PK
+    +Int doctorId FK
+    +Int shiftId FK
+    +DateTime workDate
+    +Int serviceGroupId FK
+    +Boolean isOverride
+  }
+  class ShiftCoefficient {
+    +Int id PK
+    +Int shiftId FK
+    +Int dayOfWeek
+    +Decimal coefficient
+  }
+  class Holiday {
+    +Int id PK
+    +String name
+    +DateTime startDate
+    +DateTime endDate
+    +String type
+  }
+
+  %% ─── SALARY ─────────────────────────────────────────
+  class HourlyRate {
+    +Int id PK
+    +Int amount
+    +DateTime startDate
+    +DateTime endDate
+  }
+  class FixedSalary {
+    +Int id PK
+    +Int userId FK
+    +Int amount
+    +DateTime startDate
+    +DateTime endDate
+  }
+  class Allowance {
+    +Int id PK
+    +String name
+    +Int amount
+    +String appliesTo
+    +DateTime startDate
+  }
+  class Payslip {
+    +Int id PK
+    +Int userId FK
+    +String month
+    +String role
+    +Int sessionCount
+    +Decimal hoursWorked
+    +Int salaryAmount
+    +Int allowance
+    +Int deduction
+    +Int netSalary
+    +String status
+  }
+
+  %% ─── SMS & SYSTEM ────────────────────────────────────
+  class SmsConfig {
+    +Int id PK
+    +Boolean isEnabled
+    +String provider
+    +String brandname
+  }
+  class SmsTemplate {
+    +Int id PK
+    +String type UK
+    +String name
+    +Boolean isEnabled
+  }
+  class SmsLog {
+    +Int id PK
+    +String phone
+    +String type
+    +String status
+    +DateTime createdAt
+  }
+  class SystemLog {
+    +Int id PK
+    +Int userId FK
+    +String action
+    +String detail
+    +String ip
+    +DateTime createdAt
+  }
+
+  %% ══════════════════════════════════════════
+  %% RELATIONSHIPS
+  %% ══════════════════════════════════════════
+
+  %% User ↔ Role (M:N)
+  User "1" --> "N" UserRole : has
+  Role "1" --> "N" UserRole : assigned to
+
+  %% User → Profile (1:1)
+  User "1" *-- "0..1" DoctorProfile       : profile
+  User "1" *-- "0..1" ReceptionistProfile : profile
+  User "1" *-- "0..1" AccountantProfile   : profile
+  User "1" *-- "0..1" AdminProfile        : profile
+
+  %% User → Clinical
+  User "1" --> "N" Appointment    : "doctor"
+  User "1" --> "N" DoctorSchedule : "doctor"
+  User "1" --> "N" Reception      : "receptionist"
+  User "1" --> "N" Reception      : "doctor"
+  User "1" --> "N" SystemLog      : creates
+  User "1" --> "N" Holiday        : creates
+
+  %% Patient
+  Patient "1" --> "N" Appointment  : books
+  Patient "1" --> "N" Reception    : checks in
+  Patient "1" --> "N" DentalRecord : has
+  Patient "1" --> "N" Invoice      : pays
+
+  %% Appointment → Reception
+  Appointment "1" --> "0..1" Reception : leads to
+
+  %% Reception
+  DentalChair "1" --> "N" Reception : seats
+  Reception   "1" *-- "0..1" DentalRecord       : creates
+  Reception   "1" *-- "0..1" Invoice            : generates
+  Reception   "1" *-- "0..1" PatientComplexity  : has
+
+  %% DentalRecord
+  DentalRecord "1" *-- "N" DentalRecordService : contains
+  Service      "1" --> "N" DentalRecordService : used in
+
+  %% ServiceGroup / Service
+  ServiceGroup "1" *-- "N" Service              : groups
+  Service      "1" *-- "N" ServicePrice         : priced
+  Service      "1" --> "N" Appointment          : booked for
+  Service      "1" --> "N" InvoiceItem          : billed as
+  ServiceGroup "1" --> "N" ServiceGroupDoctor   : doctors
+  User         "1" --> "N" ServiceGroupDoctor   : "as doctor"
+  ServiceGroup "1" --> "N" DoctorSchedule       : for group
+
+  %% Invoice
+  Invoice "1" *-- "N" InvoiceItem : has
+
+  %% WorkShift / Schedule
+  WorkShift "1" --> "N" DoctorSchedule  : defines
+  WorkShift "1" *-- "N" ShiftCoefficient : has
+
+  %% DoctorSchedule ↔ Reception
+  DoctorSchedule "1" --> "N" Reception : links
+
+  %% Salary
+  User          "1" --> "N" Payslip     : earns
+  User          "1" --> "N" FixedSalary : assigned
+  Payslip       ..>          HourlyRate : "calculated from"
+  Payslip       ..>          FixedSalary : "or from"
+  Payslip       ..>          ShiftCoefficient : "uses coeff"
+  Payslip       ..>          PatientComplexity : "uses coeff"
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: AUTH                                             -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="tab-auth" class="panel">
+  <div class="diagram-wrap">
+    <div class="mermaid">
+classDiagram
+  direction LR
+
+  class User {
+    +Int id PK
+    +String fullName
+    +String username UK
+    +String email UK
+    +String password hash
+    +Boolean isActive
+    +Int loginAttempts
+    +DateTime lockedUntil
+    +String lockReason
+    +DateTime createdAt
+    +DateTime updatedAt
+  }
+  class Role {
+    +Int id PK
+    +String name UK
+    -- ADMIN
+    -- DOCTOR
+    -- RECEPTIONIST
+    -- ACCOUNTANT
+  }
+  class UserRole {
+    +Int id PK
+    +Int userId FK
+    +Int roleId FK
+    +UNIQUE(userId, roleId)
+  }
+  class DoctorProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String phone
+    +String gender
+    +DateTime dateOfBirth
+    +String degree
+    +String specialization
+    +String licenseNumber UK
+    +DateTime licenseIssueDate
+    +Int yearsOfExperience
+    +String employmentStatus
+    +DateTime startDate
+    +Int maxAppointmentsPerDay
+    +Decimal baseSalary
+  }
+  class ReceptionistProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String phone
+    +String gender
+    +DateTime dateOfBirth
+    +String address
+    +String nationalId
+    +Int yearsOfExperience
+    +String customerServiceLevel
+  }
+  class AccountantProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String phone
+    +String gender
+    +String degree
+    +String specialization
+    +String certificateNumber
+    +Int yearsOfExperience
+  }
+  class AdminProfile {
+    +Int id PK
+    +Int userId UK,FK
+    +String position
+    +String department
+    +String employmentStatus
+    +DateTime startDate
+    +String contractNumber
+  }
+  class UserCertificate {
+    +Int id PK
+    +Int userId FK
+    +String filename
+    +String originalName
+    +Int size
+    +DateTime uploadedAt
+  }
+  class RefreshToken {
+    +Int id PK
+    +String token UK
+    +Int userId FK
+    +DateTime expiresAt
+    +DateTime createdAt
+  }
+  class PasswordResetToken {
+    +Int id PK
+    +String token UK
+    +Int userId FK
+    +DateTime expiresAt
+    +Boolean used
+  }
+
+  User "1" --> "N" UserRole            : has roles
+  Role "1" --> "N" UserRole            : assigned to
+  User "1" *-- "0..1" DoctorProfile       : profile
+  User "1" *-- "0..1" ReceptionistProfile : profile
+  User "1" *-- "0..1" AccountantProfile   : profile
+  User "1" *-- "0..1" AdminProfile        : profile
+  User "1" *-- "N" UserCertificate      : uploads
+  User "1" *-- "N" RefreshToken         : sessions
+  User "1" *-- "N" PasswordResetToken   : resets
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: CLINIC                                           -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="tab-clinic" class="panel">
+  <div class="diagram-wrap">
+    <div class="mermaid">
+classDiagram
+  direction TB
+
+  class Patient {
+    +Int id PK
+    +String code UK
+    +String fullName
+    +DateTime dateOfBirth
+    +String gender
+    +String phone
+    +String nationalId
+    +String bhytCode
+    +String classification
+    -- NEW | REGULAR | VIP
+    +String allergies
+    +String systemicDiseases
+    +Json toothChart
+    +Boolean isActive
+  }
+
+  class Appointment {
+    +Int id PK
+    +String code UK
+    +String patientName
+    +String patientPhone
+    +DateTime appointmentDate
+    +String status
+    -- PENDING|CONFIRMED|COMPLETED
+    -- CANCELLED|NO_SHOW
+    +Int doctorId FK
+    +Int patientId FK
+    +Int serviceId FK
+    +Int createdBy FK
+    +String cancelReason
+  }
+
+  class Reception {
+    +Int id PK
+    +String code UK
+    +Int patientId FK
+    +Int appointmentId UK,FK
+    +Int receptionistId FK
+    +Int doctorId FK
+    +Int chairId FK
+    +Int scheduleId FK
+    +String visitReason
+    +Int queuePriority
+    +Int queuePosition
+    +String status
+    -- WAITING|SEATED|IN_PROGRESS
+    -- DONE|CANCELLED|ABSENT
+    +DateTime arrivedAt
+    +DateTime seatStartAt
+    +DateTime endAt
+  }
+
+  class DentalChair {
+    +Int id PK
+    +String name
+    +Int number UK
+    +Boolean isActive
+  }
+
+  class PatientComplexity {
+    +Int id PK
+    +Int receptionId FK
+    +Decimal proposedCoeff
+    +String proposedReason
+    +Int proposedBy FK
+    +Decimal approvedCoeff
+    +Int approvedBy FK
+    +DateTime approvedAt
+    +String status
+    -- NORMAL|PENDING|APPROVED
+  }
+
+  class DentalRecord {
+    +Int id PK
+    +String code UK
+    +Int receptionId UK,FK
+    +Int patientId FK
+    +Int doctorId FK
+    +String visitReason
+    +String symptoms
+    +String icd10Code
+    +String icd10Description
+    +String clinicalNotes
+    +String aftercareNotes
+    +DateTime followUpDate
+    +String status
+    -- DRAFT | SIGNED
+    +DateTime signedAt
+  }
+
+  class DentalRecordService {
+    +Int id PK
+    +Int recordId FK
+    +Int serviceId FK
+    +String toothNumber
+    +Int unitPrice snapshot
+    +Int quantity
+    +String note
+  }
+
+  class Invoice {
+    +Int id PK
+    +String code UK
+    +Int receptionId UK,FK
+    +Int dentalRecordId UK,FK
+    +Int patientId FK
+    +Int doctorId FK
+    +Int subtotal
+    +Int discountAmount
+    +Float discountPct
+    +String voucherCode
+    +Int totalAmount
+    +Int bhytAmount
+    +String paymentMethod
+    -- CASH|CARD|MOMO|ZALOPAY|VNPAY
+    +String status
+    -- WAITING_PAYMENT|PAID|CANCELLED
+    +DateTime paidAt
+    +Int confirmedBy FK
+  }
+
+  class InvoiceItem {
+    +Int id PK
+    +Int invoiceId FK
+    +Int serviceId FK
+    +String serviceName snapshot
+    +String toothNumber
+    +Int unitPrice
+    +Int quantity
+    +Boolean bhytCovered
+    +Int amount
+  }
+
+  Patient      "1" --> "N" Appointment  : đặt lịch
+  Patient      "1" --> "N" Reception    : tiếp nhận
+  Patient      "1" --> "N" DentalRecord : bệnh án
+  Patient      "1" --> "N" Invoice      : thanh toán
+
+  Appointment  "1" --> "0..1" Reception : tạo lượt khám
+
+  DentalChair  "1" --> "N"   Reception  : ghế
+  Reception    "1" *-- "0..1" DentalRecord      : bệnh án
+  Reception    "1" *-- "0..1" Invoice           : hóa đơn
+  Reception    "1" *-- "0..1" PatientComplexity : hệ số phức tạp
+
+  DentalRecord "1" *-- "N" DentalRecordService : dịch vụ thực hiện
+  DentalRecord "1" --> "0..1" Invoice          : xuất hóa đơn
+  Invoice      "1" *-- "N" InvoiceItem         : hạng mục
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: SERVICE                                          -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="tab-service" class="panel">
+  <div class="diagram-wrap">
+    <div class="mermaid">
+classDiagram
+  direction LR
+
+  class ServiceGroup {
+    +Int id PK
+    +String name UK
+    +String description
+    +DateTime createdAt
+  }
+
+  class Service {
+    +Int id PK
+    +String code UK
+    +String name
+    +String description
+    +Int duration minutes
+    +String status
+    -- ACTIVE | INACTIVE
+    +Int usageCount
+    +Int serviceGroupId FK
+    +DateTime activatedAt
+  }
+
+  class ServicePrice {
+    +Int id PK
+    +Int serviceId FK
+    +Int basePrice
+    +Float discountPct
+    +DateTime startDate
+    +DateTime endDate
+    +Int createdBy FK
+    -- Lịch sử thay đổi giá
+  }
+
+  class ServiceGroupDoctor {
+    +Int id PK
+    +Int serviceGroupId FK
+    +Int doctorId FK
+    +UNIQUE(serviceGroupId, doctorId)
+    -- Bác sĩ phụ trách nhóm
+  }
+
+  class DoctorProfile {
+    +Int userId UK,FK
+    +String specialization
+    +Json servicesCanPerform
+  }
+
+  ServiceGroup "1" *-- "N" Service             : chứa dịch vụ
+  Service      "1" *-- "N" ServicePrice         : lịch sử giá
+  ServiceGroup "1" --> "N" ServiceGroupDoctor   : phân bổ BS
+  DoctorProfile "1" --> "N" ServiceGroupDoctor  : được phân vào
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: SCHEDULE                                         -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="tab-schedule" class="panel">
+  <div class="diagram-wrap">
+    <div class="mermaid">
+classDiagram
+  direction TB
+
+  class WorkShift {
+    +Int id PK
+    +String name UK
+    +String startTime HH:MM
+    +String endTime HH:MM
+    +Int slotDuration phút
+    +Int bufferTime phút
+    +Int maxPatients
+    +Int reserveSlots
+    +Json applyDays [1..7]
+    +Boolean isActive
+    +String colorCode
+  }
+
+  class ShiftCoefficient {
+    +Int id PK
+    +Int shiftId FK
+    +Int dayOfWeek 1=T2..7=CN
+    +Decimal coefficient
+    +Int updatedBy FK
+    +UNIQUE(shiftId, dayOfWeek)
+    -- UC4.2: HS lương theo ca×ngày
+  }
+
+  class DoctorSchedule {
+    +Int id PK
+    +Int doctorId FK
+    +Int shiftId FK
+    +DateTime workDate
+    +Int serviceGroupId FK
+    +Boolean isOverride
+    +String note
+    +Int createdBy FK
+    +UNIQUE(doctorId, shiftId, workDate)
+  }
+
+  class Holiday {
+    +Int id PK
+    +String name
+    +DateTime startDate
+    +DateTime endDate
+    +String type
+    -- NATIONAL|PRIVATE|RECURRING
+    +String startTime
+    +String endTime
+    +Boolean sendSms
+    +Boolean autoCancel
+    +Int createdBy FK
+  }
+
+  class Reception {
+    +Int scheduleId FK
+    +String status
+    +DateTime arrivedAt
+    -- walk-in | appointment
+  }
+
+  WorkShift      "1" --> "N"    DoctorSchedule   : xếp lịch
+  WorkShift      "1" *-- "N"    ShiftCoefficient : hệ số
+  DoctorSchedule "1" --> "N"    Reception        : lượt khám thực tế
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB: SALARY                                           -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="tab-salary" class="panel">
+  <div class="diagram-wrap">
+    <div class="mermaid">
+classDiagram
+  direction LR
+
+  class HourlyRate {
+    +Int id PK
+    +Int amount đồng/giờ
+    +DateTime startDate
+    +DateTime endDate
+    +Int createdBy FK
+    -- UC4.1a: đơn giá giờ BS
+  }
+
+  class FixedSalary {
+    +Int id PK
+    +Int userId FK
+    +Int amount đồng/tháng
+    +DateTime startDate
+    +DateTime endDate
+    +Int createdBy FK
+    -- UC4.1b: lương cố định LT/KT
+  }
+
+  class Allowance {
+    +Int id PK
+    +String name
+    +Int amount đồng/tháng
+    +String appliesTo
+    -- RECEPTIONIST|ACCOUNTANT|BOTH
+    +DateTime startDate
+    +DateTime endDate
+    +Int createdBy FK
+    -- UC4.1c: phụ cấp chung
+  }
+
+  class ShiftCoefficient {
+    +Int shiftId FK
+    +Int dayOfWeek
+    +Decimal coefficient
+    -- UC4.2: HS ca làm việc
+  }
+
+  class PatientComplexity {
+    +Int receptionId FK
+    +Decimal proposedCoeff
+    +Decimal approvedCoeff
+    +String status
+    -- UC4.3: HS ca phức tạp
+  }
+
+  class Payslip {
+    +Int id PK
+    +Int userId FK
+    +String month YYYY-MM
+    +String role
+    -- DOCTOR|RECEPTIONIST|ACCOUNTANT
+    +Int sessionCount số ca BS
+    +Decimal hoursWorked giờ QĐ
+    +Int salaryAmount lương ca/CB
+    +Int allowance phụ cấp
+    +Int deduction khấu trừ
+    +Int netSalary thực nhận
+    +String status
+    -- DRAFT→APPROVED→FINALIZED
+    +Int createdBy FK
+    +UNIQUE(userId, month)
+  }
+
+  class DoctorSchedule {
+    +Int doctorId FK
+    +Int shiftId FK
+    +DateTime workDate
+    -- Nguồn tính lương BS
+  }
+
+  %% Công thức lương bác sĩ:
+  %% Giờ QĐ = Giờ_ca × (HS_ca + HS_BN)
+  %% Tiền_ca = Giờ_QĐ × HS_BS × Đơn_giá/h
+  %% HS_BS phụ thuộc DoctorProfile.degree
+
+  Payslip ..> HourlyRate        : "①Lấy đơn giá/h"
+  Payslip ..> DoctorSchedule    : "②Lấy danh sách ca"
+  Payslip ..> ShiftCoefficient  : "③HS ca × ngày"
+  Payslip ..> PatientComplexity : "④HS BN phức tạp"
+  Payslip ..> FixedSalary       : "①(LT/KT) lương CB"
+  Payslip ..> Allowance         : "⑤Cộng phụ cấp"
+    </div>
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    themeVariables: {
+      primaryColor:       '#dbeafe',
+      primaryTextColor:   '#1e3a5f',
+      primaryBorderColor: '#93c5fd',
+      lineColor:          '#3b82f6',
+      secondaryColor:     '#f0fdf4',
+      tertiaryColor:      '#faf5ff',
+      fontSize:           '13px',
+    },
+    classDiagram: { useMaxWidth: false },
+  });
+
+  function showTab(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>

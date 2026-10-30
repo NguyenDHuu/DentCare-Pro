@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `systemlog` ADD COLUMN `module` VARCHAR(191) NULL,
+    ADD COLUMN `status` VARCHAR(191) NOT NULL DEFAULT 'SUCCESS';

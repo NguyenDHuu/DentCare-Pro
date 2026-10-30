@@ -1,0 +1,625 @@
+@startuml DentCare_Pro_ClassDiagram
+
+!theme cerulean-outline
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam classBackgroundColor #FAFCFF
+skinparam classBorderColor #93C5FD
+skinparam classArrowColor #3B82F6
+skinparam packageBackgroundColor #F0F9FF
+skinparam packageBorderColor #BFDBFE
+skinparam packageFontSize 13
+skinparam packageFontStyle bold
+skinparam noteFontSize 10
+skinparam noteBackgroundColor #FFFBEB
+skinparam noteBorderColor #FDE68A
+skinparam shadowing false
+skinparam roundcorner 8
+
+title <b>DentCare Pro — Sơ đồ lớp hệ thống</b>\n<i>30 models · 7 nhóm nghiệp vụ · MySQL + Prisma ORM</i>
+
+' ============================================================
+' PACKAGE 1: USER & PHÂN QUYỀN
+' ============================================================
+package "👤 User & Phân quyền" #EFF6FF {
+
+  class User << (E,#2563EB) Entity >> {
+    + id            : Int          <<PK>>
+    + fullName      : String
+    + username      : String       <<UK>>
+    + email         : String       <<UK>>
+    + password      : String       <<hash>>
+    + isActive      : Boolean
+    + loginAttempts : Int
+    + lockedUntil   : DateTime?
+    + lockReason    : String?
+    + createdAt     : DateTime
+    + updatedAt     : DateTime
+  }
+
+  class Role << (E,#2563EB) Entity >> {
+    + id   : Int    <<PK>>
+    + name : String <<UK>>
+    .. Values ..
+    ADMIN · DOCTOR
+    RECEPTIONIST · ACCOUNTANT
+  }
+
+  class UserRole << (J,#7C3AED) Junction >> {
+    + id     : Int <<PK>>
+    + userId : Int <<FK>>
+    + roleId : Int <<FK>>
+    .. Constraint ..
+    UNIQUE(userId, roleId)
+  }
+
+  class DoctorProfile << (P,#0D9488) Profile >> {
+    + id                   : Int      <<PK>>
+    + userId               : Int      <<UK,FK>>
+    + phone                : String?
+    + gender               : String?
+    + dateOfBirth          : DateTime?
+    + avatar               : String?
+    + nationalId           : String?
+    + degree               : String?
+    + specialization       : String?
+    + licenseNumber        : String?  <<UK>>
+    + licenseIssueDate     : DateTime?
+    + licenseExpiryDate    : DateTime?
+    + yearsOfExperience    : Int?
+    + employmentStatus     : String?
+    + position             : String?
+    + startDate            : DateTime?
+    + endDate              : DateTime?
+    + maxAppointmentsPerDay: Int?
+    + isAvailableOnline    : Boolean
+    + baseSalary           : Decimal?
+    + salaryType           : String?
+    + servicesCanPerform   : Json?
+  }
+
+  class ReceptionistProfile << (P,#0D9488) Profile >> {
+    + id                  : Int      <<PK>>
+    + userId              : Int      <<UK,FK>>
+    + phone               : String?
+    + gender              : String?
+    + dateOfBirth         : DateTime?
+    + avatar              : String?
+    + nationalId          : String?
+    + educationLevel      : String?
+    + graduatedSchool     : String?
+    + yearsOfExperience   : Int?
+    + customerServiceLevel: String?
+    + computerSkills      : Json?
+  }
+
+  class AccountantProfile << (P,#0D9488) Profile >> {
+    + id                  : Int      <<PK>>
+    + userId              : Int      <<UK,FK>>
+    + phone               : String?
+    + gender              : String?
+    + degree              : String?
+    + specialization      : String?
+    + certificateNumber   : String?
+    + yearsOfExperience   : Int?
+  }
+
+  class AdminProfile << (P,#0D9488) Profile >> {
+    + id               : Int      <<PK>>
+    + userId           : Int      <<UK,FK>>
+    + position         : String?
+    + department       : String?
+    + employmentStatus : String?
+    + startDate        : DateTime?
+    + contractNumber   : String?
+  }
+
+  class UserCertificate << (E,#2563EB) Entity >> {
+    + id           : Int      <<PK>>
+    + userId       : Int      <<FK>>
+    + filename     : String
+    + originalName : String
+    + mimetype     : String
+    + size         : Int
+    + uploadedAt   : DateTime
+  }
+
+  class RefreshToken << (T,#DC2626) Token >> {
+    + id        : Int      <<PK>>
+    + token     : String   <<UK>>
+    + userId    : Int      <<FK>>
+    + expiresAt : DateTime
+    + createdAt : DateTime
+  }
+
+  class PasswordResetToken << (T,#DC2626) Token >> {
+    + id        : Int      <<PK>>
+    + token     : String   <<UK>>
+    + userId    : Int      <<FK>>
+    + expiresAt : DateTime
+    + used      : Boolean
+    + createdAt : DateTime
+  }
+}
+
+' ============================================================
+' PACKAGE 2: BỆNH NHÂN & ĐẶT LỊCH
+' ============================================================
+package "🏥 Bệnh nhân & Đặt lịch" #F0FDF4 {
+
+  class Patient << (E,#16A34A) Entity >> {
+    + id                   : Int      <<PK>>
+    + code                 : String   <<UK>>
+    + fullName             : String
+    + dateOfBirth          : DateTime
+    + gender               : String
+    + phone                : String
+    + nationalId           : String?
+    + bhytCode             : String?
+    + address              : String?
+    + classification       : String
+    .. NEW | REGULAR | VIP ..
+    + allergies            : String?
+    + systemicDiseases     : String?
+    + dentalAnxietyLevel   : String?
+    + toothChart           : Json?
+    + isActive             : Boolean
+    + createdBy            : Int?     <<FK>>
+  }
+
+  class Appointment << (E,#16A34A) Entity >> {
+    + id              : Int      <<PK>>
+    + code            : String   <<UK>>
+    + patientName     : String
+    + patientPhone    : String
+    + patientDob      : DateTime?
+    + patientGender   : String?
+    + appointmentDate : DateTime
+    + status          : String
+    .. PENDING | CONFIRMED | COMPLETED ..
+    .. CANCELLED | NO_SHOW ..
+    + note            : String?
+    + cancelReason    : String?
+    + doctorId        : Int?     <<FK>>
+    + patientId       : Int?     <<FK>>
+    + serviceId       : Int?     <<FK>>
+    + createdBy       : Int?     <<FK>>
+  }
+}
+
+' ============================================================
+' PACKAGE 3: TIẾP ĐÓN & KHÁM BỆNH
+' ============================================================
+package "🪑 Tiếp đón & Khám bệnh" #FFF7ED {
+
+  class DentalChair << (E,#EA580C) Entity >> {
+    + id       : Int     <<PK>>
+    + name     : String
+    + number   : Int     <<UK>>
+    + isActive : Boolean
+  }
+
+  class Reception << (E,#EA580C) Entity >> {
+    + id             : Int      <<PK>>
+    + code           : String   <<UK>>
+    + patientId      : Int      <<FK>>
+    + appointmentId  : Int?     <<UK,FK>>
+    + receptionistId : Int      <<FK>>
+    + doctorId       : Int?     <<FK>>
+    + chairId        : Int?     <<FK>>
+    + scheduleId     : Int?     <<FK>>
+    + visitReason    : String
+    + queuePriority  : Int
+    + queuePosition  : Int?
+    + status         : String
+    .. WAITING | SEATED | IN_PROGRESS ..
+    .. DONE | CANCELLED | ABSENT ..
+    + cancelReason   : String?
+    + arrivedAt      : DateTime
+    + seatStartAt    : DateTime?
+    + endAt          : DateTime?
+  }
+
+  class PatientComplexity << (E,#EA580C) Entity >> {
+    + id             : Int      <<PK>>
+    + receptionId    : Int      <<FK>>
+    + proposedCoeff  : Decimal
+    + proposedReason : String?
+    + proposedBy     : Int      <<FK>>
+    + approvedCoeff  : Decimal?
+    + approvedBy     : Int?     <<FK>>
+    + approvedAt     : DateTime?
+    + status         : String
+    .. NORMAL | PENDING | APPROVED ..
+    ' UC4.3 – Hệ số ca phức tạp
+  }
+
+  class DentalRecord << (E,#EA580C) Entity >> {
+    + id               : Int      <<PK>>
+    + code             : String   <<UK>>
+    + receptionId      : Int      <<UK,FK>>
+    + patientId        : Int      <<FK>>
+    + doctorId         : Int      <<FK>>
+    + visitReason      : String?
+    + symptoms         : String?
+    + icd10Code        : String?
+    + icd10Description : String?
+    + clinicalNotes    : String?
+    + aftercareNotes   : String?
+    + followUpDate     : DateTime?
+    + status           : String
+    .. DRAFT | SIGNED ..
+    + signedAt         : DateTime?
+  }
+
+  class DentalRecordService << (J,#7C3AED) Junction >> {
+    + id          : Int    <<PK>>
+    + recordId    : Int    <<FK>>
+    + serviceId   : Int    <<FK>>
+    + toothNumber : String?
+    + unitPrice   : Int    <<snapshot>>
+    + quantity    : Int
+    + note        : String?
+  }
+}
+
+' ============================================================
+' PACKAGE 4: DỊCH VỤ & GIÁ
+' ============================================================
+package "💊 Dịch vụ & Giá" #F5F3FF {
+
+  class ServiceGroup << (E,#7C3AED) Entity >> {
+    + id          : Int    <<PK>>
+    + name        : String <<UK>>
+    + description : String?
+    + createdAt   : DateTime
+    + updatedAt   : DateTime
+  }
+
+  class Service << (E,#7C3AED) Entity >> {
+    + id             : Int      <<PK>>
+    + code           : String   <<UK>>
+    + name           : String
+    + description    : String?
+    + duration       : Int
+    + status         : String
+    .. ACTIVE | INACTIVE ..
+    + usageCount     : Int
+    + serviceGroupId : Int      <<FK>>
+    + activatedAt    : DateTime?
+  }
+
+  class ServicePrice << (E,#7C3AED) Entity >> {
+    + id          : Int      <<PK>>
+    + serviceId   : Int      <<FK>>
+    + basePrice   : Int
+    + discountPct : Float
+    + startDate   : DateTime
+    + endDate     : DateTime?
+    + createdBy   : Int?     <<FK>>
+    ' Lịch sử thay đổi giá
+  }
+
+  class ServiceGroupDoctor << (J,#7C3AED) Junction >> {
+    + id             : Int <<PK>>
+    + serviceGroupId : Int <<FK>>
+    + doctorId       : Int <<FK>>
+    .. Constraint ..
+    UNIQUE(serviceGroupId, doctorId)
+  }
+}
+
+' ============================================================
+' PACKAGE 5: HÓA ĐƠN & THANH TOÁN
+' ============================================================
+package "💳 Hóa đơn & Thanh toán" #FEFCE8 {
+
+  class Invoice << (E,#CA8A04) Entity >> {
+    + id             : Int      <<PK>>
+    + code           : String   <<UK>>
+    + receptionId    : Int      <<UK,FK>>
+    + dentalRecordId : Int      <<UK,FK>>
+    + patientId      : Int      <<FK>>
+    + doctorId       : Int      <<FK>>
+    + subtotal       : Int
+    + discountAmount : Int
+    + discountPct    : Float
+    + voucherCode    : String?
+    + totalAmount    : Int
+    + bhytAmount     : Int
+    + paymentMethod  : String?
+    .. CASH | CARD | MOMO | ZALOPAY | VNPAY ..
+    + status         : String
+    .. WAITING_PAYMENT | PAID | CANCELLED ..
+    + paidAt         : DateTime?
+    + confirmedBy    : Int?     <<FK>>
+    + notes          : String?
+  }
+
+  class InvoiceItem << (E,#CA8A04) Entity >> {
+    + id           : Int    <<PK>>
+    + invoiceId    : Int    <<FK>>
+    + serviceId    : Int    <<FK>>
+    + serviceName  : String <<snapshot>>
+    + toothNumber  : String?
+    + unitPrice    : Int
+    + quantity     : Int
+    + bhytCovered  : Boolean
+    + amount       : Int
+    + note         : String?
+  }
+}
+
+' ============================================================
+' PACKAGE 6: LỊCH LÀM VIỆC
+' ============================================================
+package "📅 Lịch làm việc" #F0FDF4 {
+
+  class WorkShift << (E,#059669) Entity >> {
+    + id            : Int     <<PK>>
+    + name          : String  <<UK>>
+    + startTime     : String  <<HH:MM>>
+    + endTime       : String  <<HH:MM>>
+    + slotDuration  : Int     <<phút>>
+    + bufferTime    : Int     <<phút>>
+    + maxPatients   : Int
+    + reserveSlots  : Int
+    + applyDays     : Json    <<[1..7]>>
+    + isActive      : Boolean
+    + colorCode     : String
+  }
+
+  class ShiftCoefficient << (E,#059669) Entity >> {
+    + id          : Int     <<PK>>
+    + shiftId     : Int     <<FK>>
+    + dayOfWeek   : Int     <<1=T2..7=CN>>
+    + coefficient : Decimal
+    + updatedBy   : Int?    <<FK>>
+    + updatedAt   : DateTime
+    .. Constraint ..
+    UNIQUE(shiftId, dayOfWeek)
+    ' UC4.2 – Hệ số ca × ngày trong tuần
+  }
+
+  class DoctorSchedule << (E,#059669) Entity >> {
+    + id             : Int      <<PK>>
+    + doctorId       : Int      <<FK>>
+    + shiftId        : Int      <<FK>>
+    + workDate       : DateTime
+    + serviceGroupId : Int?     <<FK>>
+    + isOverride     : Boolean
+    + note           : String?
+    + createdBy      : Int?     <<FK>>
+    .. Constraint ..
+    UNIQUE(doctorId, shiftId, workDate)
+  }
+
+  class Holiday << (E,#059669) Entity >> {
+    + id          : Int      <<PK>>
+    + name        : String
+    + startDate   : DateTime
+    + endDate     : DateTime
+    + type        : String
+    .. NATIONAL | PRIVATE | RECURRING ..
+    + startTime   : String?
+    + endTime     : String?
+    + sendSms     : Boolean
+    + autoCancel  : Boolean
+    + createdBy   : Int?     <<FK>>
+  }
+}
+
+' ============================================================
+' PACKAGE 7: QUẢN LÝ LƯƠNG
+' ============================================================
+package "💰 Quản lý lương (UC4)" #FFF1F2 {
+
+  class HourlyRate << (E,#DC2626) Entity >> {
+    + id        : Int      <<PK>>
+    + amount    : Int      <<đồng/giờ>>
+    + startDate : DateTime
+    + endDate   : DateTime?
+    + createdBy : Int?     <<FK>>
+    ' UC4.1a – Đơn giá giờ BS
+  }
+
+  class FixedSalary << (E,#DC2626) Entity >> {
+    + id        : Int      <<PK>>
+    + userId    : Int      <<FK>>
+    + amount    : Int      <<đồng/tháng>>
+    + startDate : DateTime
+    + endDate   : DateTime?
+    + createdBy : Int?     <<FK>>
+    ' UC4.1b – Lương cố định LT/KT
+  }
+
+  class Allowance << (E,#DC2626) Entity >> {
+    + id        : Int      <<PK>>
+    + name      : String
+    + amount    : Int      <<đồng/tháng>>
+    + appliesTo : String
+    .. RECEPTIONIST | ACCOUNTANT | BOTH ..
+    + startDate : DateTime
+    + endDate   : DateTime?
+    + createdBy : Int?     <<FK>>
+    ' UC4.1c – Phụ cấp chung
+  }
+
+  class Payslip << (E,#DC2626) Entity >> {
+    + id           : Int      <<PK>>
+    + userId       : Int      <<FK>>
+    + month        : String   <<YYYY-MM>>
+    + role         : String
+    .. DOCTOR | RECEPTIONIST | ACCOUNTANT ..
+    + sessionCount : Int?     <<số ca BS>>
+    + hoursWorked  : Decimal? <<giờ quy đổi>>
+    + salaryAmount : Int      <<lương ca/CB>>
+    + allowance    : Int      <<phụ cấp>>
+    + deduction    : Int      <<khấu trừ>>
+    + netSalary    : Int      <<thực nhận>>
+    + status       : String
+    .. DRAFT → APPROVED → FINALIZED ..
+    + note         : String?
+    + createdBy    : Int?     <<FK>>
+    .. Constraint ..
+    UNIQUE(userId, month)
+  }
+}
+
+' ============================================================
+' PACKAGE 8: SMS & HỆ THỐNG
+' ============================================================
+package "📱 SMS & Hệ thống" #F8FAFC {
+
+  class SmsConfig << (S,#64748B) Singleton >> {
+    + id         : Int     <<PK, =1>>
+    + isEnabled  : Boolean
+    + provider   : String
+    + apiKey     : String?
+    + brandname  : String
+    + dailyLimit : Int
+    + quietStart : String
+    + quietEnd   : String
+    + secretKey  : String?
+    + updatedAt  : DateTime
+  }
+
+  class SmsTemplate << (E,#64748B) Entity >> {
+    + id        : Int     <<PK>>
+    + type      : String  <<UK>>
+    + name      : String
+    + content   : String
+    + isEnabled : Boolean
+    + sortOrder : Int
+    + updatedAt : DateTime
+  }
+
+  class SmsLog << (E,#64748B) Entity >> {
+    + id            : Int      <<PK>>
+    + recipientName : String?
+    + phone         : String
+    + type          : String
+    + status        : String
+    .. PENDING | SENT | FAILED ..
+    + content       : String
+    + retryCount    : Int
+    + errorMsg      : String?
+    + sentAt        : DateTime?
+    + createdAt     : DateTime
+  }
+
+  class SystemLog << (E,#64748B) Entity >> {
+    + id        : Int      <<PK>>
+    + userId    : Int?     <<FK>>
+    + action    : String
+    + detail    : String?
+    + ip        : String?
+    + module    : String?
+    + status    : String
+    + createdAt : DateTime
+  }
+}
+
+' ============================================================
+' RELATIONSHIPS – User & Auth
+' ============================================================
+User         "1" *-- "N"    UserRole             : has
+Role         "1" *-- "N"    UserRole             : assigned
+User         "1" *-- "0..1" DoctorProfile        : profile
+User         "1" *-- "0..1" ReceptionistProfile  : profile
+User         "1" *-- "0..1" AccountantProfile    : profile
+User         "1" *-- "0..1" AdminProfile         : profile
+User         "1" *-- "N"    UserCertificate      : uploads
+User         "1" *-- "N"    RefreshToken         : sessions
+User         "1" *-- "N"    PasswordResetToken   : resets
+User         "1" --> "N"    SystemLog            : logs
+
+' ============================================================
+' RELATIONSHIPS – Clinical flow
+' ============================================================
+User         "1" --> "N"    Appointment    : "as doctor"
+User         "1" --> "N"    DoctorSchedule : "as doctor"
+User         "1" --> "N"    Reception      : "as receptionist"
+User         "1" --> "N"    Reception      : "as doctor"
+User         "1" --> "N"    DentalRecord   : "as doctor"
+User         "1" --> "N"    Invoice        : "as doctor"
+User         "1" --> "N"    Holiday        : creates
+
+Patient      "1" --> "N"    Appointment    : đặt lịch
+Patient      "1" --> "N"    Reception      : tiếp nhận
+Patient      "1" --> "N"    DentalRecord   : bệnh án
+Patient      "1" --> "N"    Invoice        : thanh toán
+
+Appointment  "1" --> "0..1" Reception      : tạo lượt khám
+
+DentalChair  "1" --> "N"    Reception      : xếp ghế
+Reception    "1" *-- "0..1" PatientComplexity : hệ số phức tạp
+Reception    "1" *-- "0..1" DentalRecord   : tạo bệnh án
+Reception    "1" *-- "0..1" Invoice        : tạo hóa đơn
+
+DentalRecord "1" *-- "N"    DentalRecordService : dịch vụ thực hiện
+DentalRecord "1" --> "0..1" Invoice        : xuất hóa đơn
+
+Invoice      "1" *-- "N"    InvoiceItem    : hạng mục
+
+' ============================================================
+' RELATIONSHIPS – Service
+' ============================================================
+ServiceGroup "1" *-- "N"    Service               : nhóm dịch vụ
+ServiceGroup "1" --> "N"    ServiceGroupDoctor    : phân bổ BS
+ServiceGroup "1" --> "N"    DoctorSchedule        : cho nhóm dịch vụ
+Service      "1" *-- "N"    ServicePrice          : lịch sử giá
+Service      "1" --> "N"    Appointment           : đặt cho
+Service      "1" --> "N"    DentalRecordService   : thực hiện
+Service      "1" --> "N"    InvoiceItem           : lập hóa đơn
+User         "1" --> "N"    ServiceGroupDoctor    : "as doctor"
+
+' ============================================================
+' RELATIONSHIPS – Schedule
+' ============================================================
+WorkShift    "1" --> "N"    DoctorSchedule  : định nghĩa ca
+WorkShift    "1" *-- "N"    ShiftCoefficient : hệ số ca
+DoctorSchedule "1" --> "N"  Reception       : lượt khám thực tế
+
+' ============================================================
+' RELATIONSHIPS – Salary (UC4)
+' ============================================================
+User         "1" --> "N"    Payslip         : nhận phiếu lương
+User         "1" --> "N"    FixedSalary     : lương cố định
+Payslip      ..>            HourlyRate      : "①đơn giá/h (BS)"
+Payslip      ..>            FixedSalary     : "①lương CB (LT/KT)"
+Payslip      ..>            DoctorSchedule  : "②danh sách ca"
+Payslip      ..>            ShiftCoefficient: "③HS ca × ngày"
+Payslip      ..>            PatientComplexity:"④HS BN phức tạp"
+Payslip      ..>            Allowance       : "⑤cộng phụ cấp"
+
+' ============================================================
+' NOTES
+' ============================================================
+note top of Payslip
+  <b>Công thức lương Bác sĩ:</b>
+  Giờ_QĐ = Giờ_ca × (HS_ca + HS_BN)
+  Tiền_ca = Giờ_QĐ × HS_BS × Đơn_giá/h
+  HS_BS ← DoctorProfile.degree
+  ────────────────────────────────
+  <b>Luồng trạng thái:</b>
+  DRAFT → APPROVED → FINALIZED
+           ↘ CANCELLED
+end note
+
+note right of PatientComplexity
+  <b>UC4.3 – Hệ số ca phức tạp</b>
+  Do bác sĩ đề xuất (PENDING)
+  Kế toán/Admin phê duyệt (APPROVED)
+  Cộng vào HS_BN khi tính lương
+end note
+
+note bottom of UserRole
+  <b>Roles:</b>
+  ADMIN · DOCTOR
+  RECEPTIONIST · ACCOUNTANT
+end note
+
+@enduml
