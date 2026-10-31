@@ -210,3 +210,7 @@ npm run preview      # Xem trước bản build production
 - [Zustand](https://zustand-demo.pmnd.rs)
 - [Lucide React](https://lucide.dev)
 - Axios
+
+
+## Video demo của nhóm
+- https://www.youtube.com/watch?v=QjNUOvjtSdA
